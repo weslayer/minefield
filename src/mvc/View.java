@@ -1,28 +1,25 @@
 package mvc;
 
 import javax.swing.*;
+import java.util.concurrent.Flow;
 
-public class View extends JComponent implements AppObserver {
+public class View extends JPanel implements Subscriber {
     protected Model model;
 
-    public View(Model model) {
-        this.model = model;
-        model.addObserver(this);
+    public View(Model m) {
+        model = m;
+        model.subscribe(this);
     }
 
     public void setModel(Model model) {
-        if (this.model != null) {
-            this.model.deleteObserver(this);
-        }
+        this.model.unsubscribe(this);
         this.model = model;
-        if (model != null) {
-            model.addObserver(this);
-            repaint();
-        }
+        this.model.subscribe(this);
+        repaint();
     }
 
     @Override
-    public void update(Object source, Object arg) {
+    public void update() {
         repaint();
     }
-} 
+}
