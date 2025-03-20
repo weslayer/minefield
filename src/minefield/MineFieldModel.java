@@ -9,175 +9,150 @@ import java.io.Serializable;
  * Handles game state, player movement, and game rules.
  */
 public class MineFieldModel extends Model implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
+
     public static final int DEFAULT_SIZE = 20;
     public static final int DEFAULT_PERCENT_MINED = 5;
 
     private final int size;
-    private final boolean[][] mines;
-    private final boolean[][] visited;
+    private Tile[][] tiles;
     private int playerRow;
     private int playerCol;
     private boolean gameOver;
-    private boolean won;
-    private final List<int[]> path;
-    
+
     public MineFieldModel() {
         this(DEFAULT_SIZE);
     }
-    
+
     public MineFieldModel(int size) {
         this.size = size;
-        this.mines = new boolean[size][size];
-        this.visited = new boolean[size][size];
-        this.path = new ArrayList<>();
-        
-        initializeMines();
-        initializePlayer();
+        gameOver = false;
+        tiles = new Tile[size][size];
+        for(int i = 0; i < size; i++) {
+           for(int j = 0; j < size; j++) {
+               tiles[j][i] = new Tile(j,i);
+           }
+        }
+        makeBombs();
+        makePlayer();
     }
-    
-    private void initializeMines() {
+
+    private void makeBombs() {
         Random random = new Random();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (random.nextInt(100) < DEFAULT_PERCENT_MINED) {
                     if ((i != 0 || j != 0) && (i != size - 1 || j != size - 1)) {
-                        mines[i][j] = true;
+                        tiles[j][i].setNumBombs(-1);
                     }
                 }
             }
         }
     }
-    
-    private void initializePlayer() {
+
+    private void makePlayer() {
         playerRow = 0;
         playerCol = 0;
-        visited[playerRow][playerCol] = true;
-        path.add(new int[]{playerRow, playerCol});
-        gameOver = false;
-        won = false;
     }
-    
+
     public int getSize() {
         return size;
     }
-    
-    public boolean isVisited(int row, int col) {
-        return visited[row][col];
-    }
-    
-    public boolean isGameOver() {
-        return gameOver;
-    }
-    
-    public boolean isWon() {
-        return won;
-    }
-    
+
     public int getPlayerRow() {
         return playerRow;
     }
-    
+
     public int getPlayerCol() {
         return playerCol;
     }
-    
+
     public boolean isGoal(int row, int col) {
         return row == size - 1 && col == size - 1;
     }
-    
-    public List<int[]> getPath() {
-        return path;
-    }
 
-    public int getNeighboringMines(int row, int col) {
+    public int getNeighboringMines(int y, int x) {
+        if(tiles[x][y].getNumBombs() == -1) return -1;
         int count = 0;
-        for (int i = Math.max(0, row - 1); i <= Math.min(size - 1, row + 1); i++) {
-            for (int j = Math.max(0, col - 1); j <= Math.min(size - 1, col + 1); j++) {
-                if (mines[i][j]) {
+        for(int i = x; i < 3; i++) {
+            for(int j = y; i < 3; i++) {
+                if(!isOutOfBounds(i,j) && tiles[i][j].getNumBombs() == -1)
                     count++;
-                }
             }
         }
         return count;
     }
-    
+
     public void move(Heading heading) throws Exception {
         if (gameOver) {
-            throw new Exception("Game is already over!");
+            throw new Exception("Please make a new game to continue. Game over.");
         }
-        
-        int[] newPosition = updatePositionForHeading(heading);
-        int newRow = newPosition[0];
-        int newCol = newPosition[1];
-        
-        if (isOutOfBounds(newRow, newCol)) {
+
+        int[] newPosition = updatePosition(heading);
+        tiles[playerRow][playerCol].setPlayerOn(false);
+        playerRow = newPosition[0];
+        playerCol = newPosition[1];
+        if (isOutOfBounds(playerRow, playerCol)) {
             throw new Exception("Cannot move off the grid!");
         }
-        
-        playerRow = newRow;
-        playerCol = newCol;
-        visited[playerRow][playerCol] = true;
-        path.add(new int[]{playerRow, playerCol});
-        
+        tiles[playerRow][playerCol].changeIsSteppedOn(true);
+        tiles[playerRow][playerCol].setPlayerOn(true);
         checkGameOutcome();
-        
-        changed();
     }
-    
-    private int[] updatePositionForHeading(Heading heading) {
+
+    private int[] updatePosition(Heading heading) {
         int newRow = playerRow;
         int newCol = playerCol;
-        
+
         switch (heading) {
-            case NORTH:
+            case N:
                 newRow--;
                 break;
-            case SOUTH:
+            case S:
                 newRow++;
                 break;
-            case EAST:
+            case E:
                 newCol++;
                 break;
-            case WEST:
+            case W:
                 newCol--;
                 break;
-            case NORTHWEST:
+            case NW:
                 newRow--;
                 newCol--;
                 break;
-            case NORTHEAST:
+            case NE:
                 newRow--;
                 newCol++;
                 break;
-            case SOUTHWEST:
+            case SW:
                 newRow++;
                 newCol--;
                 break;
-            case SOUTHEAST:
+            case SE:
                 newRow++;
                 newCol++;
                 break;
         }
-        
+
         return new int[]{newRow, newCol};
     }
-    
+
     private boolean isOutOfBounds(int row, int col) {
         return row < 0 || row >= size || col < 0 || col >= size;
     }
-    
+
     private void checkGameOutcome() throws Exception {
-        if (mines[playerRow][playerCol]) {
+        if (tiles[playerRow][playerCol].getNumBombs() == -1) {
             gameOver = true;
-            throw new Exception("you stepped on a mine and died");
+            throw new Exception("You stepped on a mine! Game over!");
         }
-        
+
         if (isGoal(playerRow, playerCol)) {
             gameOver = true;
-            won = true;
-            throw new Exception("you reached the goal nice");
+            throw new Exception("You reached the goal and won!");
         }
     }
-} 
+
+    public Tile[][] getTiles() { return tiles; }
+
+}
