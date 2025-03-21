@@ -3,7 +3,7 @@ package minefield;
 import javax.swing.*;
 import java.awt.*;
 
-public class Tile extends JLabel {
+public class Tile extends JPanel {
 
     private int x;
     private int y;
@@ -18,7 +18,7 @@ public class Tile extends JLabel {
         isSteppedOn = false;
         isGoal = false;
         playerOn = false;
-        this.setSize(15, 15);
+        //this.setSize(15, 15);
     }
 
     public Tile() {
@@ -33,15 +33,24 @@ public class Tile extends JLabel {
     public int getY() { return y; }
     public void setX(int x) { this.x = x; }
     public void setY(int y) { this.y = y; }
-    public void changeIsSteppedOn(boolean b) { isSteppedOn = b; }
+    public void changeIsSteppedOn(boolean b) { 
+        isSteppedOn = b; 
+        colorTile();
+    }
     public boolean isSteppedOn() { return isSteppedOn; }
     // returns -1 if it is a bomb
     public int getNumBombs() { return numBombs; }
     public void setNumBombs(int num) { numBombs = num; }
     public boolean isGoal() { return isGoal; }
-    public void setIsGoal() { isGoal = true; }
+    public void setIsGoal() { 
+        isGoal = true; 
+        colorTile();
+    }
     public boolean isPlayerOn() { return playerOn; }
-    public void setPlayerOn(boolean b) { playerOn = b; }
+    public void setPlayerOn(boolean b) { 
+        playerOn = b; 
+        colorTile();
+    }
     public void colorTile() {
         if(isGoal) {
             if(isSteppedOn) this.setBackground(Color.LIGHT_GRAY);
@@ -63,8 +72,14 @@ public class Tile extends JLabel {
     }
 
     public String toString() {
-        if(isSteppedOn) { return "["+numBombs+"]"; }
-        else { return "[?]"; }
+        if(isSteppedOn) { 
+            if (numBombs == -1) {
+                return "B";
+            } else {
+                return ""+numBombs;
+            }
+        }
+        else { return "?"; }
     }
 
 }

@@ -40,21 +40,10 @@ public class MineFieldFactory implements AppFactory {
 
     @Override
     public Command newEditCommand(Model model, Heading command, Object object) {
-        /*if(command.equals("N")
-            || command.equals("NW")
-            || command.equals("NE")
-            || command.equals("SW")
-            || command.equals("SE")
-            || command.equals("E")
-            || command.equals("W")
-            || command.equals("S"))
-        {*/
-            return new MoveCommand(model, command);
-        //}
-        //return null;
+        return new MoveCommand(model, command);
     }
 
     public String about() {
-        return "Cyberdellic Designs MineField, 2025. All rights reserved.";
+        return "minefield project by karma balakrishnan, brian brown, and wesley wong";
     }
 }

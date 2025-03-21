@@ -1,7 +1,6 @@
 package mvc;
 
 import javax.swing.*;
-import java.util.concurrent.Flow;
 
 public class View extends JPanel implements Subscriber {
     protected Model model;

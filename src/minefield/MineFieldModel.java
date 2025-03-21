@@ -2,13 +2,12 @@ package minefield;
 
 import mvc.*;
 import java.util.*;
-import java.io.Serializable;
 
 /**
  * Model class for the Minefield game.
  * Handles game state, player movement, and game rules.
  */
-public class MineFieldModel extends Model implements Serializable {
+public class MineFieldModel extends Model {
 
     public static final int DEFAULT_SIZE = 20;
     public static final int DEFAULT_PERCENT_MINED = 5;
@@ -47,11 +46,40 @@ public class MineFieldModel extends Model implements Serializable {
                 }
             }
         }
+        
+        // Now calculate numbers for all non-bomb tiles
+        for (int col = 0; col < size; col++) {
+            for (int row = 0; row < size; row++) {
+                if (tiles[row][col].getNumBombs() != -1) {
+                    tiles[row][col].setNumBombs(countNeighboringMines(row, col));
+                }
+            }
+        }
+    }
+
+    private int countNeighboringMines(int row, int col) {
+        int count = 0;
+        for (int r = row - 1; r <= row + 1; r++) {
+            for (int c = col - 1; c <= col + 1; c++) {
+                // Skip the center tile and out of bounds tiles
+                if ((r == row && c == col) || isOutOfBounds(r, c)) {
+                    continue;
+                }
+                
+                if (tiles[r][c].getNumBombs() == -1) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private void makePlayer() {
         playerRow = 0;
         playerCol = 0;
+        // Mark the starting position as already stepped on
+        tiles[playerRow][playerCol].changeIsSteppedOn(true);
+        tiles[playerRow][playerCol].setPlayerOn(true);
     }
 
     public int getSize() {
@@ -88,14 +116,29 @@ public class MineFieldModel extends Model implements Serializable {
         }
 
         int[] newPosition = updatePosition(heading);
-        tiles[playerRow][playerCol].setPlayerOn(false);
-        playerRow = newPosition[0];
-        playerCol = newPosition[1];
-        if (isOutOfBounds(playerRow, playerCol)) {
+
+        int newRow = newPosition[0];
+        int newCol = newPosition[1];
+        
+        if (isOutOfBounds(newRow, newCol)) {
             throw new Exception("Cannot move off the grid!");
         }
+        
+        // Remove player from current tile
+        tiles[playerRow][playerCol].setPlayerOn(false);
+        
+        // Update player position
+        playerRow = newRow;
+        playerCol = newCol;
+        
+        // Update new tile
         tiles[playerRow][playerCol].changeIsSteppedOn(true);
         tiles[playerRow][playerCol].setPlayerOn(true);
+        
+        // Notify observers that model has changed
+        setUnsavedChanges(true);
+        notifySubscribers();
+        
         checkGameOutcome();
     }
 
@@ -105,32 +148,32 @@ public class MineFieldModel extends Model implements Serializable {
 
         switch (heading) {
             case N:
-                newRow--;
+                newCol--;
                 break;
             case S:
-                newRow++;
+                newCol++;
                 break;
             case E:
-                newCol++;
+                newRow++;
                 break;
             case W:
-                newCol--;
+                newRow--;
                 break;
             case NW:
-                newRow--;
                 newCol--;
+                newRow--;
                 break;
             case NE:
-                newRow--;
-                newCol++;
+                newCol--;
+                newRow++;
                 break;
             case SW:
-                newRow++;
-                newCol--;
+                newCol++;
+                newRow--;
                 break;
             case SE:
-                newRow++;
                 newCol++;
+                newRow++;
                 break;
         }
 
@@ -149,10 +192,19 @@ public class MineFieldModel extends Model implements Serializable {
 
         if (isGoal(playerRow, playerCol)) {
             gameOver = true;
-            throw new Exception("You reached the goal and won!");
+            throw new WinException("Congratulations! You reached the goal and won!");
         }
     }
 
     public Tile[][] getTiles() { return tiles; }
+
+    /**
+     * Custom exception class for win conditions to differentiate from errors
+     */
+    public static class WinException extends Exception {
+        public WinException(String message) {
+            super(message);
+        }
+    }
 
 }

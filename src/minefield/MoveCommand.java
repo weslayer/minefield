@@ -10,8 +10,6 @@ public class MoveCommand extends Command {
         this.heading = heading;
     }
 
-
-
     @Override
     public void execute() throws Exception {
         ((MineFieldModel)model).move(heading);
