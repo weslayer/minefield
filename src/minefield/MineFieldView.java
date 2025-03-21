@@ -48,15 +48,15 @@ public class MineFieldView extends View {
                 if(tiles[i][j].isPlayerOn()) {
                     // Draw normal tile background first
                     if(tiles[i][j].isSteppedOn()) {
-                        g.setColor(new Color(245, 245, 245));  // Almost white
+                        g.setColor(Color.LIGHT_GRAY);  // Almost white
                         g.fillRect(x, y, CELL_SIZE, CELL_SIZE);
                     } else {
-                        g.setColor(new Color(200, 200, 200));  // Gray
+                        g.setColor(Color.GRAY);  // Gray
                         g.fillRect(x, y, CELL_SIZE, CELL_SIZE);
                     }
                     
                     // Draw red border to indicate player position
-                    g.setColor(Color.RED);
+                    g.setColor(Color.BLUE);
                     g.drawRect(x, y, CELL_SIZE, CELL_SIZE);
                     
                     // Show number of neighboring bombs if this is stepped on
@@ -74,11 +74,9 @@ public class MineFieldView extends View {
                     else{
                         g.setColor(Color.GREEN);
                         g.drawRect(x, y,CELL_SIZE,CELL_SIZE);
-                        g.setColor(Color.LIGHT_GRAY);
+                        g.setColor(Color.GRAY);
                         g.fillRect(x, y,CELL_SIZE,CELL_SIZE);
                     }
-                    g.setColor(new Color(0, 100, 0));     // Dark green
-                    g.drawRect(x, y,CELL_SIZE,CELL_SIZE);
                     
                     // Also show number of neighboring bombs if this is stepped on
                     if (tiles[i][j].isSteppedOn()) {
@@ -86,9 +84,9 @@ public class MineFieldView extends View {
                     }
                 }
                 else if(tiles[i][j].isSteppedOn()) {
-                    g.setColor(new Color(245, 245, 245));  // Almost white
+                    g.setColor(Color.LIGHT_GRAY);  // Almost white
                     g.fillRect(x, y,CELL_SIZE,CELL_SIZE);
-                    g.setColor(new Color(220, 220, 220));  // Light gray
+                    g.setColor(Color.WHITE);  // Light gray
                     g.drawRect(x, y,CELL_SIZE,CELL_SIZE);
                     
                     // Draw the number or mine
@@ -96,19 +94,19 @@ public class MineFieldView extends View {
                 }
                 else {
                     // Unstepped cell
-                    g.setColor(new Color(200, 200, 200));  // Gray
+                    g.setColor(Color.GRAY);  // Gray
                     g.fillRect(x, y,CELL_SIZE,CELL_SIZE);
-                    g.setColor(new Color(150, 150, 150));  // Darker gray
+                    g.setColor(Color.BLACK);  // Darker gray
                     g.drawRect(x, y,CELL_SIZE,CELL_SIZE);
                     
                     // flag for finish
                     if (i == size - 1 && j == size - 1) {
-                        g.setColor(new Color(178, 34, 34));  // red
+                        g.setColor(Color.GREEN);  // red
                         g.setFont(new Font("SansSerif", Font.BOLD, 12));
-                        g.drawString("F", x+4, y+12);
+                        g.drawString("G", x+4, y+12);
                     } else {
                         // Draw question mark for all other unstepped tiles
-                        g.setColor(new Color(100, 100, 100));
+                        g.setColor(Color.BLACK);
                         g.setFont(new Font("SansSerif", Font.BOLD, 11));
                         g.drawString("?", x + 4, y + 12);
                     }
@@ -130,7 +128,7 @@ public class MineFieldView extends View {
         else {
             // COOL COLORS
             switch (numBombs) {
-                case 0: g.setColor(new Color(120, 120, 120)); break; // Gray for zero
+                case 0: g.setColor(Color.DARK_GRAY); break; // Gray for zero
                 case 1: g.setColor(new Color(25, 118, 210)); break;  // Blue
                 case 2: g.setColor(new Color(56, 142, 60)); break;   // Green
                 case 3: g.setColor(new Color(211, 47, 47)); break;   // Red

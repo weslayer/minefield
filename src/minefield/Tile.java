@@ -18,7 +18,6 @@ public class Tile extends JPanel {
         isSteppedOn = false;
         isGoal = false;
         playerOn = false;
-        //this.setSize(15, 15);
     }
 
     public Tile() {

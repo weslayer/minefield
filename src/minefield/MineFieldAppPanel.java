@@ -27,40 +27,41 @@ public class MineFieldAppPanel extends JPanel implements ActionListener {
         mineField = new MineFieldModel();
         view = new MineFieldView(mineField);
 
-        // Create a direction pad with properly sized buttons
-        JPanel controlPanel = new JPanel();
-        JPanel directionPad = new JPanel(new GridLayout(3, 3, 2, 2));
-        directionPad.setPreferredSize(new Dimension(150, 150));
-        
-        // Create buttons with fixed size
-        northwestButton = createDirectionButton("NW");
-        northButton = createDirectionButton("N");
-        northeastButton = createDirectionButton("NE");
-        westButton = createDirectionButton("W");
-        JButton centerButton = new JButton(); // Empty center button
-        centerButton.setEnabled(false);
-        eastButton = createDirectionButton("E");
-        southwestButton = createDirectionButton("SW");
-        southButton = createDirectionButton("S");
-        southeastButton = createDirectionButton("SE");
-        
-        // Add buttons to pad in a 3x3 grid
-        directionPad.add(northwestButton);
-        directionPad.add(northButton);
-        directionPad.add(northeastButton);
-        directionPad.add(westButton);
-        directionPad.add(centerButton);
-        directionPad.add(eastButton);
-        directionPad.add(southwestButton);
-        directionPad.add(southButton);
-        directionPad.add(southeastButton);
-        
-        controlPanel.add(directionPad);
+        JPanel p = new JPanel(new GridLayout(4,2));
+        northButton = new JButton("N");
+        southButton = new JButton("S");
+        eastButton = new JButton("E");
+        westButton = new JButton("W");
+        northwestButton = new JButton("NW");
+        northeastButton = new JButton("NE");
+        southwestButton = new JButton("SW");
+        southeastButton = new JButton("SE");
+
+        northButton.addActionListener(this);
+        southButton.addActionListener(this);
+        eastButton.addActionListener(this);
+        westButton.addActionListener(this);
+        northwestButton.addActionListener(this);
+        northeastButton.addActionListener(this);
+        southwestButton.addActionListener(this);
+        southeastButton.addActionListener(this);
+
+        p.add(createButtonPanel(northwestButton));
+        p.add(createButtonPanel(northButton));
+        p.add(createButtonPanel(northeastButton));
+        p.add(createButtonPanel(westButton));
+        p.add(createButtonPanel(eastButton));
+        p.add(createButtonPanel(southwestButton));
+        p.add(createButtonPanel(southButton));
+        p.add(createButtonPanel(southeastButton));
+
+        add(p, BorderLayout.WEST);
         
         // Set up main layout
-        this.setLayout(new BorderLayout());
-        this.add(controlPanel, BorderLayout.WEST);
-        this.add(view, BorderLayout.CENTER);
+        this.setLayout((new GridLayout(1, 2)));
+        this.add(p);
+        this.add(view);
+
 
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,7 +69,7 @@ public class MineFieldAppPanel extends JPanel implements ActionListener {
         cp.add(this);
         frame.setJMenuBar(this.createMenuBar());
         frame.setTitle("MineField");
-        frame.setSize(620, 440);
+        frame.setSize(600, 350);
         frame.setVisible(true);
     }
 
@@ -76,7 +77,7 @@ public class MineFieldAppPanel extends JPanel implements ActionListener {
         JMenuBar result = new JMenuBar();
         JMenu fileMenu = Utilities.makeMenu("File", new String[]{"New", "Save", "Open", "Quit"}, this);
         result.add(fileMenu);
-        JMenu editMenu = Utilities.makeMenu("Edit", new String[]{"bruh add stuff here"}, this);
+        JMenu editMenu = Utilities.makeMenu("Edit", new String[]{"N", "W", "NW", "NE", "E", "S", "SW", "SE"}, this);
         result.add(editMenu);
         JMenu helpMenu = Utilities.makeMenu("Help", new String[]{"About", "Help"}, this);
         result.add(helpMenu);
@@ -217,21 +218,10 @@ public class MineFieldAppPanel extends JPanel implements ActionListener {
         }
     }
 
-    private JButton createDirectionButton(String text) {
-        JButton button = new JButton(text);
-        
-        button.setMargin(new Insets(8, 8, 8, 8));
-        button.setFont(new Font("SansSerif", Font.BOLD, 14));
-        button.setForeground(new Color(50, 50, 50));
-        button.setBackground(new Color(240, 240, 240));
-        
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(true);
-        button.setOpaque(true);
-        
-        button.addActionListener(this);
-        return button;
+    private JPanel createButtonPanel(JButton b) {
+        JPanel pan = new JPanel();
+        pan.add(b);
+        return pan;
     }
 
     public static void main(String[] args) {
